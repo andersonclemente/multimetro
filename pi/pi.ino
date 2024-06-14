@@ -67,11 +67,11 @@ float lerAmperimetro(){
 
 
 float lerVoltimetro(){
-	float leituraEscalaArduino = analogRead(PINO_VOLTIMETRO);
+  float leituraEscalaArduino = analogRead(PINO_VOLTIMETRO);
 	
   //converte valor lido na porta lógica em tensão desejada
   float leituraEmVolts = leituraEscalaArduino *  maximoVoltimetro / 1023.0;
-	return leituraEmVolts;
+  return leituraEmVolts;
 }
 
 float lerOhmimetro(){
@@ -82,10 +82,10 @@ float lerOhmimetro(){
   }
 
   //calcula a média dos valores lidos no pino do ohmimetro
-	float leituraEscalaArduino = somador/qtdAmostragens;
+  float leituraEscalaArduino = somador/qtdAmostragens;
   
   //impede divisão por zero e indica que não há resistência com valor negativo
-	if(leituraEscalaArduino >= 1022) return -1;
+  if(leituraEscalaArduino >= 1022) return -1;
 
   //converte o valor lido em resistência
   double resistencaResultante, aux;
@@ -96,9 +96,9 @@ float lerOhmimetro(){
 }
 
 void ligarBuzzer(){
-	digitalWrite(PINO_BUZZER, true);
+  digitalWrite(PINO_BUZZER, true);
 }
 
 void desligarBuzzer(){
-	digitalWrite(PINO_BUZZER, false);
+  digitalWrite(PINO_BUZZER, false);
 }
