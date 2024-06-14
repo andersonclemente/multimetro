@@ -1,16 +1,16 @@
-// MULTIMETRO
+// DEFINE PINAGEM
 #define PINO_OHMIMETRO A0
 #define PINO_VOLTIMETRO A1
 #define PINO_AMPERIMETRO A2
 #define PINO_BUZZER 9
+#define ALIMENTACAO_AMPERIMETRO 5
 
-const float maximoVoltimetro = 35.0;
+//VARIAVEIS DE CALIBRAÇÃO
+const float maximoVoltimetro = 35.2;
 const float r1_ohmimetro = 9940;
 
-
-
-
-float voltage;
+//VARIAVEIS USADA EM LOOP
+float corrente,resistencia, tensao; 
 
 void setup(){
   pinMode(PINO_VOLTIMETRO, INPUT);
@@ -18,13 +18,12 @@ void setup(){
   
   pinMode(PINO_BUZZER, OUTPUT);
 
-  pinMode(5, OUTPUT);
-  digitalWrite(5, HIGH);
+  pinMode(ALIMENTACAO_AMPERIMETRO, OUTPUT);
+  digitalWrite(ALIMENTACAO_AMPERIMETRO, HIGH);
   
   Serial.begin(9600);
 }
 
-float corrente,resistencia, tensao; 
 
 
 void loop(){
@@ -42,19 +41,23 @@ void loop(){
   Serial.println(resistencia) ;
 }
 
+
+//ler sensor de corrente
 float lerAmperimetro(){
   const int offset = 484, qtdAmostragens = 50;
   
   unsigned int somador = 0, amostra = 0;
   float media = 0.0, leitura = 0.0, correnteResultante = 0.0;
-
+  
+  //soma as amostragens do sensor
   for (int x = 0; x < qtdAmostragens; x++) {
-    amostra = analogRead(A2);
+    amostra = analogRead(PINO_AMPERIMETRO);
     somador = somador + amostra;
 
     delay(3);
   }
 
+  //calcula a media e converte em Ampere
   media = somador / qtdAmostragens;
   leitura = media - offset;
   correnteResultante = leitura * 0.04;
@@ -62,27 +65,31 @@ float lerAmperimetro(){
   return correnteResultante;
 }
 
+
 float lerVoltimetro(){
 	float leituraEscalaArduino = analogRead(PINO_VOLTIMETRO);
-	float leituraEmVolts = leituraEscalaArduino *  maximoVoltimetro / 1023.0;
+	
+  //converte valor lido na porta lógica em tensão desejada
+  float leituraEmVolts = leituraEscalaArduino *  maximoVoltimetro / 1023.0;
 	return leituraEmVolts;
 }
 
 float lerOhmimetro(){
   int somador = 0, qtdAmostragens = 10;
   for (int x = 0; x < qtdAmostragens; x++) {
-    somador = somador + analogRead(PINO_OHMIMETRO);;
+    somador = somador + analogRead(PINO_OHMIMETRO);
     delay(3);
   }
 
+  //calcula a média dos valores lidos no pino do ohmimetro
 	float leituraEscalaArduino = somador/qtdAmostragens;
-  //impede divisão por zero
+  
+  //impede divisão por zero e indica que não há resistência com valor negativo
 	if(leituraEscalaArduino >= 1022) return -1;
 
+  //converte o valor lido em resistência
   double resistencaResultante, aux;
   aux = (float)analogRead(A0)/1023;
-  if((1 - aux) == 0) return -1;
-
   resistencaResultante = aux * (float) r1_ohmimetro / (1 - aux);
   
   return resistencaResultante; 
